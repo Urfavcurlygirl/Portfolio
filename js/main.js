@@ -489,16 +489,36 @@ document.addEventListener('DOMContentLoaded', () => {
   const modalImg = document.getElementById('modalImg');
   const captionText = document.getElementById('modalCaption');
 
-  modal.addEventListener('click', () => modal.classList.remove('active'));
+  // Close on overlay click
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal || e.target.classList.contains('close-modal')) {
+      modal.classList.remove('active');
+    }
+  });
 
-  document.querySelectorAll('.project-card .project-cover img').forEach(img => {
-    img.style.cursor = 'pointer';
-    img.addEventListener('click', function(e) {
+  // Close on Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') modal.classList.remove('active');
+  });
+
+  // Attach click to ALL project/certificate cards
+  document.querySelectorAll('.project-card').forEach(card => {
+    card.style.cursor = 'pointer';
+    card.addEventListener('click', function(e) {
+      // Do not open modal if clicking the GitHub link
+      if (e.target.closest('a')) return;
+      
+      const img = this.querySelector('.project-cover img');
+      if (!img) return;
+
+      e.preventDefault();
       e.stopPropagation();
+      e.stopImmediatePropagation();
+      
       modal.classList.add('active');
-      modalImg.src = this.src;
-      const titleEl = this.closest('.project-card').querySelector('h3');
-      captionText.innerHTML = titleEl ? titleEl.innerHTML : this.alt;
+      modalImg.src = img.src;
+      const titleEl = this.querySelector('h3');
+      captionText.textContent = titleEl ? titleEl.textContent : img.alt;
     });
   });
 
